@@ -1,59 +1,53 @@
 <?php
-session_start(); // セッションを開始
-ini_set('display_errors', 0);
+//ログインページ
+session_start(); 
+//トークンを生成しログイン後のhomeページアクセス時にセッション変数と比較させることで、セッションID固定化攻撃を防止する。
 function getToken(){
     $s = openssl_random_pseudo_bytes(24);
     return base64_encode($s);
 }
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
 
     // MySQL接続設定
-    $servername = "mysql309.phy.lolipop.lan";
-    $user_name = "LAA1616860";
-    $password = "20051022";
-    $dbname = "LAA1616860-yserver";
+    $servername = "host-name";
+    $user_name = "user-name";
+    $password = "password";
+    $dbname = "database-name";
 
-    // 接続を試みる
     $conn = new mysqli($servername, $user_name, $password, $dbname);
     if ($conn->connect_error) {
         die("接続失敗: " . $conn->connect_error);
     }
 
-    // ユーザー入力のサニタイズ
-    $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
-    $pass = $_POST['pass'];
+    //ユーザーが入力した文字列に対して入力検証を実施し不正入力によるSQLインジェクション等の防止を図る。
 
-    // SQLインジェクションを防ぐためにプリペアドステートメントを使用
+    $username = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
+    $pass = htmlspecialchars($_POST['pass'], ENT_QUOTES, 'UTF-8');
+
     $stmt = $conn->prepare("SELECT * FROM login WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // 結果が存在するか確認
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
 
-        // パスワードの検証
         if (password_verify($pass, $row['password'])) {
             $token = getToken();
             setcookie('token',$token);
             $_SESSION['token'] = $token;
             $_SESSION['username'] = $username;
-            $_SESSION['userid'] = htmlspecialchars($row["userid"]); // セッションにユーザーidを保存
+            $_SESSION['userid'] = htmlspecialchars($row["userid"]); 
 
-            echo "<script type='text/javascript'>
-                            window.location.href = 'home.php';
-                        </script>";
+            header("Location: home.php");
+            exit;
+
         } else {
-            // パスワードが一致しない場合の処理
             $error = "パスワードが異なります。";
         }
     } else {
-        // ユーザー名が存在しない場合の処理
         $error = "ログインIDが異なります。";
     }
 

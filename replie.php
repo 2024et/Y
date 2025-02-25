@@ -12,10 +12,10 @@
     }
 
     // MySQL接続設定
-    $servername = "mysql309.phy.lolipop.lan";
-    $username = "LAA1616860";
-    $password = "20051022";
-    $dbname = "LAA1616860-yserver";
+    $servername = "host-name";
+    $username = "user-name";
+    $password = "password";
+    $dbname = "database-name";
 
     // 接続を試みる
     $conn = new mysqli($servername, $username, $password, $dbname);

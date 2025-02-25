@@ -1,50 +1,45 @@
 <?php
-ini_set('display_errors', 0);
-
+//本投稿に対する編集機能
     session_start();
-    if (isset($_SESSION['username'])) {
+    ini_set('display_errors', 0);
+    if (!empty($_SESSION['username'])) {
         echo "ようこそ、" . htmlspecialchars($_SESSION['username']) . "さん！";
+        $username = $_SESSION['username'];
     } else {
-        echo "ゲストユーザー";
-        echo "<script type='text/javascript'>
-            window.location.href = 'login.php';
-        </script>";
+        header("Location: login.php"); exit;
     }
-    // MySQL接続設定
-    $servername = "mysql309.phy.lolipop.lan";
-    $username = "LAA1616860";
-    $password = "20051022";
-    $dbname = "LAA1616860-yserver";
 
-    // 接続を試みる
-    $conn = new mysqli($servername, $username, $password, $dbname);
+    // MySQL接続設定
+    $servername = "host-name";
+    $user_name = "user-name";
+    $password = "password";
+    $dbname = "database-name";
+
+    $conn = new mysqli($servername, $user_name, $password, $dbname);
     if ($conn->connect_error) {
         die("接続失敗: " . $conn->connect_error);
     }
-    // ユーザーネームをセッションから変数に代入
-    $user_name = htmlspecialchars($_SESSION['username']);
 
-
-    // ユーザーIDを取得
+    //ユーザーネームからユーザーIDを取得し、投稿者本人が操作しているかを判断する。
+    //このようにすることで、別ユーザーが投稿を編集するのを防止する。
     $stmt = $conn->prepare("SELECT userid FROM login WHERE username = ?");
-    $stmt->bind_param("s", $user_name);
+    $stmt->bind_param("s", $username);
 
     if ($stmt->execute()) {
-        $result = $stmt->get_result(); // 結果の取得
+        $result = $stmt->get_result(); 
 
         if ($row = $result->fetch_assoc()) {
-            $user_id = htmlspecialchars($row["userid"]); // ユーザーIDを変数に代入
+            $user_id = htmlspecialchars($row["userid"]);
         }
-        $stmt->close(); // ステートメントを閉じる
+        $stmt->close(); 
     } else {
-        echo "ユーザーIDの取得に失敗しました。";
         $conn->close();
         exit();
     }
 
     
 
-    //選択した行のpost_idを取得
+    //編集ボタンが押されたポストIDを取得し編集する。
     if (isset($_POST['id'])) {
         $post_id = $_POST['id'];
 
@@ -61,9 +56,9 @@ ini_set('display_errors', 0);
             }
         } 
 
-        //echo $post_id."/".$user_id;//デバック用
-
-         
+        //更新ボタンが押され内容を更新する。
+        //編集されたかどうかを確認するため投稿内容の最後に(編集済)を入れ、後から編集が加えられた投稿であることを明確にする。
+        //投稿内容については、ヌルバイト攻撃等による制御文字の混入防止のため正規表現による検証を実施する。
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
             ini_set('display_errors', 1);
             ini_set('display_startup_errors', 1);
@@ -71,7 +66,6 @@ ini_set('display_errors', 0);
 
             
             $text = htmlspecialchars($_POST['text']) . "(編集済)";
-
             if(preg_match('/\A[\r\n\t[:^cntrl:]]{1,500}\z/u',$text) !==1){
                 die('不正な文字が使用されています。');
             }else{
@@ -80,7 +74,8 @@ ini_set('display_errors', 0);
 
                 if ($stmt->execute()) {
 
-                    echo "<script type='text/javascript'>window.location.href = 'home.php';</script>";
+                    header("Location: home.php"); 
+                    exit;
                 } else {
                     error_log("SQL エラー: " . $stmt->error);
                     echo "エラーが発生しました。もう一度やり直してください。";

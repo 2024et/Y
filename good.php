@@ -1,25 +1,24 @@
 <?php
+//本投稿に対するいいね機能
     ini_set('display_errors', 0);
 
     // MySQL接続設定
-    $servername = "mysql309.phy.lolipop.lan";
-    $username = "LAA1616860";
-    $password = "20051022";
-    $dbname = "LAA1616860-yserver";
+    $servername = "host-name";
+    $username = "user-name";
+    $password = "password";
+    $dbname = "database-name";
 
-    // 接続を試みる
     $conn = new mysqli($servername, $username, $password, $dbname);
     if ($conn->connect_error) {
         die("接続失敗: " . $conn->connect_error);
     }
-    // POSTリクエストで送信されたIDを取得
+    //いいねボタンが押された投稿のIDを取得し実行する。
     if (isset($_POST['id'])) {
         $post_id = $_POST['id'];
 
         
         $sql = "UPDATE y_main SET count = count + 1 WHERE post_id = ?";
 
-        // プリペアドステートメントを使ったセキュリティ対策
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $post_id);
 
@@ -33,15 +32,3 @@
     header("Location: home.php");
     exit();
     ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>いいね!</title>
-</head>
-<body>
-    
-</body>
-</html>

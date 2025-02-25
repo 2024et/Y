@@ -3,10 +3,10 @@ session_start();
 echo '<img src="images/icon.png" width="30" height="30" alt="代替文字"><br>';
 ini_set('display_errors', 0);
 // MySQL接続設定
-$servername = "mysql309.phy.lolipop.lan";
-$username = "LAA1616860";
-$password = "20051022";
-$dbname = "LAA1616860-yserver";
+$servername = "host-name";
+$username = "user-name";
+$password = "password";
+$dbname = "database-name";
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -25,14 +25,12 @@ if (empty($token) || $token !== $_SESSION['token']) {
     
     echo "ようこそ、" . htmlspecialchars($_SESSION['username']) . "さん！";
     $GETuser_id = htmlspecialchars($_SESSION['userid']);
-    //echo $GETuser_id;//デバック用
 
 }
 $sql = "UPDATE access SET value = value + 1 WHERE name = 1";
 if ($conn->query($sql) === TRUE) {
-    //echo "レコードが更新されました";
 } else {
-    //echo "エラー: " . $conn->error;
+    echo "エラー: " . $conn->error;
 }
 ?>
 <!DOCTYPE html>
@@ -60,9 +58,8 @@ if ($conn->query($sql) === TRUE) {
         $(document).ready(function() {
             var pagetop = $('.pagetop');
 
-            // ボタンがクリックされたときの処理
             pagetop.click(function () {
-                window.location.href = 'post.php'; // post.phpにリダイレクト
+                window.location.href = 'post.php'; 
             });
         });
     </script>
@@ -73,7 +70,6 @@ if ($conn->query($sql) === TRUE) {
                     <li><a href="home.php">ホーム</a></li>
                     <li><a href="profile.php?user_id=<?php echo urlencode($GETuser_id) ?>">Myプロフィール</a></li>
                     <li><a href="search.php">検索</a></li>
-                    <li><a href="setting.php">設定・ポリシー・利用方法・窓口</a></li>
                     <li><a href="post.php">投稿する</a></li>
                 </ul> 
             </div>
@@ -88,15 +84,12 @@ if ($conn->query($sql) === TRUE) {
                 echo '<div class="twitter__container">';
                 while ($row = $result->fetch_assoc()) {
                     echo '<div class="twitter__block">';
-                    //アイコン
                     $imagePath = 'images/' . htmlspecialchars($row["icon"], ENT_QUOTES, 'UTF-8');
                     echo '<figure><img src="' . $imagePath . '" alt="User Image"></figure>';
                     echo '<div class="twitter__block-text">';
-                    //プロフィール画面への移動とユーザーネーム/idの表示(リンク化)
                     echo '<a href="profile.php?user_id='.urlencode($row["user_id"]).'" class="link"><div class="name">'.htmlspecialchars($row["user_name"]).'<span class="name_reply">@'.htmlspecialchars($row["user_id"]).'</span></div></a>';
-                    //文字表示
                     echo '<div class="text">' . htmlspecialchars($row["text"]) . '</div>';
-                    //写真があるかどうかの検証
+                    //添付画像の確認
                     if (!empty($row["picture"])) {
                         echo '<div class="in-pict"><img src="images/' . htmlspecialchars($row["picture"], ENT_QUOTES, 'UTF-8') . '"></div>';
                     }
@@ -104,7 +97,7 @@ if ($conn->query($sql) === TRUE) {
                     echo '<div class="twitter__icon"><span class="twitter-bubble"></span><span class="twitter-loop"></span><span class="twitter-heart"></span></div>';
                     echo '<div style="display: flex; justify-content: space-around;">';
 
-                    // いいね機能
+                    //いいね機能
                     echo '<div>';
                     echo '<form action="good.php" method="post">';
                     echo '<input type="hidden" name="id" value="' . $row['post_id'] . '">';
@@ -113,7 +106,7 @@ if ($conn->query($sql) === TRUE) {
                     echo '</form>';
                     echo '</div>';
 
-                    // リプライ機能
+                    //リプライ機能
                     echo '<div>';
                     echo '<a href="replie.php?user_id=' . urlencode($row["post_id"]) . '" class="link">';
                     echo '<button class="likeButton">💬</button>';
@@ -121,7 +114,7 @@ if ($conn->query($sql) === TRUE) {
                     echo htmlspecialchars($row["count_rep"]);
                     echo '</div>';
 
-                    // 編集機能
+                    //編集機能
                     echo '<div>';
                     echo '<form action="edit_post.php" method="post">';
                     echo '<input type="hidden" name="id" value="' . $row['post_id'] . '">';
@@ -129,7 +122,7 @@ if ($conn->query($sql) === TRUE) {
                     echo '</form>';
                     echo '</div>';
 
-                    // 投稿削除機能
+                    //削除機能
                     echo '<div>';
                     echo '<form action="delete.php" method="post">';
                     echo '<input type="hidden" name="id" value="' . $row['post_id'] . '">';
@@ -137,13 +130,11 @@ if ($conn->query($sql) === TRUE) {
                     echo '</form>';
                     echo '</div>';
 
-                    echo '</div>'; // フレックスコンテナ終了
-
-
-                    echo '</div>'; // twitter__block-text
-                    echo '</div>'; // twitter__block
+                    echo '</div>'; 
+                    echo '</div>'; 
+                    echo '</div>';
                 }
-                echo '</div>'; // twitter__container
+                echo '</div>';
             } else {
                 echo "何も投稿されていないかデータが見つかりません。";
             }

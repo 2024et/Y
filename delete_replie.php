@@ -1,72 +1,58 @@
 <?php
+//リプライに対する削除機能
     session_start();
     ini_set('display_errors', 0);
-    if (isset($_SESSION['username'])) {
-        //echo "ようこそ、" . htmlspecialchars($_SESSION['username']) . "さん！";
+    //ユーザーのログイン状況を判別することで、ゲストユーザーによるリプライの削除を防止する。
+    if (!empty($_SESSION['username'])) {
+        $username = $_SESSION['username'];
     } else {
-        //echo "ゲストユーザー";
+        header("Location: login.php"); exit;;
     }
     
-    // MySQL接続設定
-    $servername = "mysql309.phy.lolipop.lan";
-    $username = "LAA1616860";
-    $password = "20051022";
-    $dbname = "LAA1616860-yserver";
+    // MySQLへの接続設定
+    $servername = "host-name";
+    $username = "user-name";
+    $password = "password";
+    $dbname = "database-name";
 
-    // 接続を試みる
     $conn = new mysqli($servername, $username, $password, $dbname);
     if ($conn->connect_error) {
         die("接続失敗: " . $conn->connect_error);
     }
-    // ユーザーネームをセッションから変数に代入
-    $username = htmlspecialchars($_SESSION['username']);
-
-    // ユーザーIDを取得
+    //ユーザーネームからユーザーIDを取得し、投稿者本人が操作しているかを判断する。
+    //このようにすることで、別ユーザーが投稿を削除するのを防止する。
+    
     $stmt = $conn->prepare("SELECT userid FROM login WHERE username = ?");
     $stmt->bind_param("s", $username);
 
     if ($stmt->execute()) {
-        $result = $stmt->get_result(); // 結果の取得
+        $result = $stmt->get_result(); 
 
         if ($row = $result->fetch_assoc()) {
-            $user_id = htmlspecialchars($row["userid"]); // ユーザーIDを変数に代入
+            $user_id = htmlspecialchars($row["userid"]); 
         }
-        $stmt->close(); // ステートメントを閉じる
+        $stmt->close(); 
     } else {
-        //echo "ユーザーIDの取得に失敗しました。";
         $conn->close();
         exit();
     }
 
-    // POSTリクエストで送信されたIDを取得
+    //削除ボタンが押されたリプライIDを取得し削除する。
     if (isset($_POST['id'])) {
-        $replie_id = intval($_POST['id']); // 整数に変換
+        $replie_id = intval($_POST['id']); 
     }
 
-    // DELETEクエリを実行
     $sql = "DELETE FROM y_replie WHERE replie_id = ? AND user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $replie_id, $user_id);
 
     if ($stmt->execute()) {
-        echo "<script type='text/javascript'>
-                            window.location.href = 'home.php';
-                        </script>";
+        header("Location: home.php"); 
+        exit();
     } else {
         echo "削除に失敗しました。";
     }
 
     $stmt->close();
     $conn->close();
-    ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>さーくじょ!</title>
-</head>
-<body>
-</body>
-</html>
+?>

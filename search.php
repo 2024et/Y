@@ -135,7 +135,6 @@ if (isset($_SESSION['username'])) {
                     <li><a href="home.php">ホーム</a></li>
                     <li><a href="profile.php?user_id=<?php echo urlencode($GETuser_id) ?>">Myプロフィール</a></li>
                     <li><a href="search.php">検索</a></li>
-                    <li><a href="setting.php">設定・ポリシー・利用方法・窓口</a></li>
                     <li><a href="post.php">投稿する</a></li>
                 </ul> 
             </div>
@@ -150,11 +149,10 @@ if (isset($_SESSION['username'])) {
         <?php
         ini_set('display_errors', 0);
         // MySQL接続設定
-        $servername = "mysql309.phy.lolipop.lan";
-        $user_name = "LAA1616860";
-        $password = "20051022";
-        $dbname = "LAA1616860-yserver";
-
+        $servername = "host-name";
+        $username = "user-name";
+        $password = "password";
+        $dbname = "database-name";
         // 接続を試みる
         $conn = new mysqli($servername, $user_name, $password, $dbname);
         if ($conn->connect_error) {

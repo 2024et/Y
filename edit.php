@@ -4,7 +4,7 @@ session_start();
 if (isset($_SESSION['username'])) {
     // ユーザー名のサニタイズと表示
     echo '<input type="button" class="back" onclick="history.back()" value="戻る">';
-    echo "　　ようこそ、" . htmlspecialchars($_SESSION['username']) . "さん！";
+    echo "ようこそ、" . htmlspecialchars($_SESSION['username']) . "さん！";
 } else {
     echo "<script type='text/javascript'>
             window.location.href = 'login.php';
@@ -15,10 +15,10 @@ ini_set('display_errors', 0);
 
 
 // MySQL接続設定
-$servername = "mysql309.phy.lolipop.lan";
-$user_name = "LAA1616860";
-$password = "20051022";
-$dbname = "LAA1616860-yserver";
+$servername = "host-name";
+$username = "user-name";
+$password = "password";
+$dbname = "database-name";
 
 // 接続を試みる
 $conn = new mysqli($servername, $user_name, $password, $dbname);
