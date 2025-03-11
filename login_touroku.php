@@ -11,20 +11,20 @@
     <style>
         #sinki {
         display       : inline-block;
-        border-radius : 5%;          /* 角丸       */
-        font-size     : 16pt;        /* 文字サイズ */
-        text-align    : center;      /* 文字位置   */
-        cursor        : pointer;     /* カーソル   */
-        padding       : 12px 12px;   /* 余白       */
-        background    : #ffffff;     /* 背景色     */
-        color         : #6666ff;     /* 文字色     */
-        line-height   : 1em;         /* 1行の高さ  */
-        transition    : .3s;         /* なめらか変化 */
-        border        : 2px solid #ffffff;    /* 枠の指定 */
+        border-radius : 5%;          
+        font-size     : 16pt;        
+        text-align    : center;     
+        cursor        : pointer;     
+        padding       : 12px 12px;  
+        background    : #ffffff;    
+        color         : #6666ff;    
+        line-height   : 1em;         
+        transition    : .3s;        
+        border        : 2px solid #ffffff;   
         }
         #sinki:hover {
-        color         : #ffffff;     /* 背景色     */
-        background    : #6666ff;     /* 文字色     */
+        color         : #ffffff;    
+        background    : #6666ff;    
         }
         .box{
             text-align: center;
@@ -125,6 +125,9 @@
     </div>
 
     <?php
+    //アカウント登録におけるユーザー名、パスワードの入力を検証
+    //アイコン画像の拡張子の検証
+    //パスワード1回目と2回目の入力検証を経てアカウントを作成する。
     ini_set('display_errors', 0);
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $user_name = htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8');
@@ -139,14 +142,12 @@
         }else{
             if (isset($_FILES["file"]) && $_FILES["file"]["error"] === UPLOAD_ERR_OK) {
                 $targetDir = "images/";
-                $fileName = uniqid() . "_" . basename($_FILES["file"]["name"]); // ユニークなファイル名
+                $fileName = uniqid() . "_" . basename($_FILES["file"]["name"]); 
                 $targetFilePath = $targetDir . $fileName;
                 $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
-                $allowedFileTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
+                $allowedFileTypes = array('jpg', 'jpeg', 'png');
                 
-                // ファイルタイプのチェック
                 if (in_array($fileType, $allowedFileTypes)) {
-                    // ファイル移動処理
                     if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
                         if ($pass1 === $pass2) {
                             // MySQL接続設定
@@ -154,19 +155,13 @@
                             $username = "user-name";
                             $password = "password";
                             $dbname = "database-name";
-        
-                            // 接続を試みる
                             $conn = new mysqli($servername, $username, $password, $dbname);
-        
-                            // 接続チェック
                             if ($conn->connect_error) {
-                                die("接続に失敗しました。後ほど再度お試しください。"); // エラーメッセージの詳細を隠す
+                                die("接続に失敗しました。後ほど再度お試しください。"); 
                             }
         
-                            // パスワードのハッシュ化
                             $hashedPassword = password_hash($pass1, PASSWORD_DEFAULT);
         
-                            // SQL準備と実行
                             $stmt = $conn->prepare("INSERT INTO login (username, userid, icon, password,profile) VALUES (?, ?, ?, ?,?)");
                             $stmt->bind_param("sssss", $user_name, $userid, $fileName, $hashedPassword, $profile);
         
@@ -179,7 +174,6 @@
                                 echo "登録に失敗しました: " . $stmt->error;
                             }
                         } else {
-                            // パスワード不一致時のメッセージ修正
                             echo "パスワードが一致しません！";
                         }
                     } else {

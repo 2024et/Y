@@ -4,7 +4,6 @@
     /////////////////////////////////////////////////////////////////////////*/
 session_start();
 ini_set('display_errors', 0);
-// セッション変数にアクセス
 if (isset($_SESSION['username'])) {
     echo "ようこそ、" . htmlspecialchars($_SESSION['username']) . "さん！";
 } else {
@@ -12,29 +11,23 @@ if (isset($_SESSION['username'])) {
             window.location.href = 'login.php';
         </script>";
 }
-
-
-
 // MySQL接続設定
 $servername = "host-name";
 $username = "user-name";
 $password = "password";
 $dbname = "database-name";
 
-// 接続を試みる
 $conn = new mysqli($servername, $user_name, $password, $dbname);
 if ($conn->connect_error) {
     die("接続失敗: " . $conn->connect_error);
 }
-
-    //ユーザーネームを変数に代入
+//ログイン情報の取得
     $username = htmlspecialchars($_SESSION['username']);
-    // ユーザーIDとアイコンの取得
     $stmt = $conn->prepare("SELECT * FROM login WHERE username = ?");
     $stmt->bind_param("s", $username);
 
     if ($stmt->execute()) {
-        $result = $stmt->get_result(); // 結果の取得
+        $result = $stmt->get_result();
 
         if ($row = $result->fetch_assoc()) {
             $userid = htmlspecialchars($row["userid"]);
@@ -45,10 +38,7 @@ if ($conn->connect_error) {
     echo "　　ユーザーID：@".$userid;
 
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
-        //ユーザーネームはセッションから
-        //ユーザーidはdbから
         $text = $_POST['text'];
-        //アイコンはdbから
         $day = date('Y-m-d H:i:s');
         $count = "0";
         $post_id = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -65,7 +55,6 @@ if ($conn->connect_error) {
                 
                 if (in_array($fileType, $allowedFileTypes)) {
                     if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)) {
-                        // データベースに画像付きの投稿を登録
                         $stmt = $conn->prepare("INSERT INTO y_main (user_name, day, text, icon, user_id, count, post_id, picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                         $stmt->bind_param("ssssssss", $username,  $day,  $text, $icon, $userid, $count, $post_id, $fileName);
                         
@@ -77,7 +66,6 @@ if ($conn->connect_error) {
                     }
                 }
             } else {
-                // 画像がアップロードされなかった場合、pictureにNULLを挿入
                 $stmt = $conn->prepare("INSERT INTO y_main (user_name, day, text, icon, user_id, count, post_id, picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 $nullValue = null;
                 $stmt->bind_param("ssssssss", $username,  $day,  $text, $icon, $userid, $count, $post_id, $nullValue);
