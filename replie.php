@@ -1,5 +1,7 @@
 <?php
-    //セッション
+    /*////////////////////////////////////////////////////////////////////////
+    リプライページ
+    /////////////////////////////////////////////////////////////////////////*/
     session_start();
     ini_set('display_errors', 0);
    
@@ -16,14 +18,12 @@
     $username = "user-name";
     $password = "password";
     $dbname = "database-name";
-
-    // 接続を試みる
     $conn = new mysqli($servername, $username, $password, $dbname);
     if ($conn->connect_error) {
         die("接続失敗: " . $conn->connect_error);
     }
 
-    // 選択されたポストを取得。
+    // 選択されたポストIDの取得。
     if (isset($_GET['user_id'])) {
         $post_id = htmlspecialchars($_GET['user_id'], ENT_QUOTES, 'UTF-8');
 
@@ -34,16 +34,12 @@
 
         if ($result->num_rows > 0) {
             echo '<div class="twitter__container">';
-            //echo '<div class="twitter__contents scroll">';
             while ($row = $result->fetch_assoc()) {
                 echo '<div class="twitter__block">';
-                
-                // 画像を表示するための修正
                 echo "<figure>";
                 echo '<img src="images/' . htmlspecialchars($row["icon"], ENT_QUOTES, 'UTF-8') . '" alt="User Image">';
                 echo "</figure>";
-                
-                // テキスト部分の表示
+
                 echo '<div class="twitter__block-text">';
                 echo '<a href="profile.php?user_id='.urlencode($row["user_id"]).'" class="link"><div class="name">'.htmlspecialchars($row["user_name"]).'<span class="name_reply">@'.htmlspecialchars($row["user_id"]).'</span></div></a>';
                 echo '<div class="text">' . htmlspecialchars($row["text"]) . '</div><br>'; 
@@ -62,17 +58,17 @@
                 echo "<input type='hidden' name='rep' value='" . $row['post_id'] . "'>";
                 $_SESSION['post_id'] = $post_id; 
                 echo "<input type='submit' value='💬' class='likeButton'>"."←リプライ！！";
-                echo "</form></td>"; // フォーム閉じタグを適切に配置
+                echo "</form></td>"; 
                 
                 echo "いいね！：".htmlspecialchars($row["count"]);
                 
                 
                 
-                echo "</div>"; // twitter__block-text
-                echo "</div>"; // twitter__block
+                echo "</div>";
+                echo "</div>";
             }
-            echo "</div>"; // twitter__contents
-            echo "</div>"; // twitter__container
+            echo "</div>"; 
+            echo "</div>"; 
         } else {
             echo "この投稿にはまだリプライがついていません。あなたもリプライしてみましょう！！";
         }
@@ -82,21 +78,17 @@
         $stmt->bind_param("i", $post_id); // post_idが整数型である場合
         $stmt->execute();
 
-        // 結果を取得
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             echo '<div class="twitter__container">';
-            //echo '<div class="twitter__contents scroll">';
             while ($row = $result->fetch_assoc()) {
                 echo '<div class="twitter__block">';
                 
-                // 画像を表示するための修正
                 echo "<figure>";
                 echo '<img src="images/' . htmlspecialchars($row["icon"], ENT_QUOTES, 'UTF-8') . '" alt="User Image">';
                 echo "</figure>";
                 
-                // テキスト部分の表示
                 echo '<div class="twitter__block-text">';
                 echo '<font color="0067c0"><b>返信</b></font>';
                 echo '<a href="profile.php?user_id='.urlencode($row["user_id"]).'" class="link"><div class="name">'.htmlspecialchars($row["user_name"]).'<span class="name_reply">@'.htmlspecialchars($row["user_id"]).'</span></div></a>';
@@ -109,16 +101,16 @@
                 }
     
                 echo '<br>';
-                //投稿削除機能
+
                 echo '<td><form action="delete_replie.php" method="post"><input type="hidden" name="id" value="' . $row['replie_id'] . '"><input type="submit" value="🗑️" class="likeButton"></form></td>';
-                //いいね機能
+
                 echo '<td><form action="good_replie.php" method="post"><input type="hidden" name="id" value="' . $row['replie_id'] . '"><input type="submit" value="❤" class="likeButton">'. htmlspecialchars($row["count"]) .'</form></td>';
                 echo '<div class="twitter__icon"><span class="twitter-bubble"></span><span class="twitter-loop"></span><span class="twitter-heart"></span></div>';               
-                echo "</div>"; // twitter__block-text
-                echo "</div>"; // twitter__block
+                echo "</div>"; 
+                echo "</div>"; 
             }
-            echo "</div>"; // twitter__contents
-            echo "</div>"; // twitter__container
+            echo "</div>"; 
+            echo "</div>"; 
         } else {
             echo "この投稿にはまだリプライがついていません。あなたもリプライしてみましょう！！";
         }
@@ -148,7 +140,6 @@
     </style>
 </head>
 <body>
-    <p>リプライは編集機能はなし。</p>
     <hr>
     <p><center>©2024 EBATA TAKUMI</center></p>
 </body>

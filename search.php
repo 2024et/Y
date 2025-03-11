@@ -1,4 +1,7 @@
 <?php
+    /*////////////////////////////////////////////////////////////////////////
+    本投稿に対する検索機能
+    /////////////////////////////////////////////////////////////////////////*/
 session_start();
 ini_set('display_errors', 0);
 echo '<img src="images/icon.png" width="30" height="30" alt="代替文字"><br>';
@@ -72,12 +75,12 @@ if (isset($_SESSION['username'])) {
             margin: 20px auto;
             font-size: 80%;
             border: solid 1px #EAEEDC;
-            max-width: 800px; /* 最大幅を指定 */
-            width: 100%; /* 画面幅に対する100%に設定 */
+            max-width: 800px;
+            width: 100%; 
         }
 
         .twitter__block {
-            width: 100%; /* 親要素に合わせる */
+            width: 100%;
             display: block;
             padding: 10px;
             margin-bottom: 5px;
@@ -99,9 +102,9 @@ if (isset($_SESSION['username'])) {
         .twitter__block-text {
             margin: 0;
             position: relative;
-            margin-left: 60px; /* 画像とのスペース */
+            margin-left: 60px; 
             padding-right: 10px;
-            overflow: hidden; /* 溢れる部分は非表示 */
+            overflow: hidden; 
         }
 
         .twitter__block-text .text {
@@ -110,20 +113,20 @@ if (isset($_SESSION['username'])) {
         }
         .back {
         display       : inline-block;
-        font-size     : 14pt;        /* 文字サイズ */
-        text-align    : center;      /* 文字位置   */
-        cursor        : pointer;     /* カーソル   */
-        padding       : 12px 12px;   /* 余白       */
-        background    : #ffffff;     /* 背景色     */
-        color         : #000000;     /* 文字色     */
-        line-height   : 1em;         /* 1行の高さ  */
-        opacity       : 1;           /* 透明度     */
-        transition    : .3s;         /* なめらか変化 */
-        box-shadow    : 1px 1px 3px #666666;  /* 影の設定 */
+        font-size     : 14pt;       
+        text-align    : center;     
+        cursor        : pointer;     
+        padding       : 12px 12px;   
+        background    : #ffffff;    
+        color         : #000000;    
+        line-height   : 1em;       
+        opacity       : 1;          
+        transition    : .3s;         
+        box-shadow    : 1px 1px 3px #666666; 
         }
         .back:hover {
-        box-shadow    : none;        /* カーソル時の影消去 */
-        opacity       : 0.8;         /* カーソル時透明度 */
+        box-shadow    : none;        
+        opacity       : 0.8;       
         }
     </style>
 </head>
@@ -148,18 +151,18 @@ if (isset($_SESSION['username'])) {
         <p>現状：url生成を行っていないため、検索結果画面に復帰ウすることは不可能。</p>
         <?php
         ini_set('display_errors', 0);
-        // MySQL接続設定
+        // MySQLへの接続設定
         $servername = "host-name";
         $username = "user-name";
         $password = "password";
         $dbname = "database-name";
-        // 接続を試みる
+        
         $conn = new mysqli($servername, $user_name, $password, $dbname);
         if ($conn->connect_error) {
             die("接続失敗: " . $conn->connect_error);
         }
         
-
+        //入力された文字列をデータベースからLIKE句で検索し一覧表示する。
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['search'])){
             $text = "%" . $conn->real_escape_string($_POST['text']) . "%";
 
@@ -172,15 +175,12 @@ if (isset($_SESSION['username'])) {
                 echo '<div class="twitter__container">';
                 while ($row = $result->fetch_assoc()) {
                     echo '<div class="twitter__block">';
-                    //アイコン
+                    //投稿内容の表示
                     $imagePath = 'images/' . htmlspecialchars($row["icon"], ENT_QUOTES, 'UTF-8');
                     echo '<figure><img src="' . $imagePath . '" alt="User Image"></figure>';
                     echo '<div class="twitter__block-text">';
-                    //プロフィール画面への移動とユーザーネーム/idの表示(リンク化)
                     echo '<a href="profile.php?user_id='.urlencode($row["user_id"]).'" class="link"><div class="name">'.htmlspecialchars($row["user_name"]).'<span class="name_reply">@'.htmlspecialchars($row["user_id"]).'</span></div></a>';
-                    //文字表示
                     echo '<div class="text">' . htmlspecialchars($row["text"]) . '</div>';
-                    //写真があるかどうかの検証
                     if (!empty($row["picture"])) {
                         echo '<div class="in-pict"><img src="images/' . htmlspecialchars($row["picture"], ENT_QUOTES, 'UTF-8') . '"></div>';
                     }
@@ -195,10 +195,10 @@ if (isset($_SESSION['username'])) {
                     echo htmlspecialchars($row["count_rep"]);
                     echo '</div>';
 
-                    echo '</div>'; // twitter__block-text
-                    echo '</div>'; // twitter__block
+                    echo '</div>'; 
+                    echo '</div>'; 
                 }
-                echo '</div>'; // twitter__container
+                echo '</div>';
             } else {
                 echo "何も投稿されていないかデータが見つかりません。";
             }
