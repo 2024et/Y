@@ -14,7 +14,6 @@ $username = "user-name";
 $password = "password";
 $dbname = "database-name";
 
-// 接続を試みる
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("接続失敗: " . $conn->connect_error);
@@ -23,20 +22,13 @@ $stmt = $conn->prepare("SELECT * FROM login WHERE userid = ?");
 $stmt->bind_param("s", $user_id);
 
 if ($stmt->execute()) {
-    $result = $stmt->get_result(); // 結果の取得
+    $result = $stmt->get_result(); 
 
     if ($row = $result->fetch_assoc()) {
         $user_name = htmlspecialchars($row["username"]);
         $icon = htmlspecialchars($row["icon"], ENT_QUOTES, 'UTF-8');
     }
 }
-
-//echo "ユーザーネーム：".$user_name."<br>";
-//echo "ユーザーID："."@".$user_id."<br>";
-//echo '<img src="' . $icon. '" alt="User Image">'."<br>";
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -60,58 +52,40 @@ if ($stmt->execute()) {
     </div>
     <div class="box footer">
     <?php
-    
-      // ステートメントの準備
+    //ログイン情報の取得
       $stmt = $conn->prepare("SELECT * FROM login WHERE userid = ?");
       $stmt->bind_param("s", $user_id); 
       $stmt->execute();
-
-      // 結果を取得
       $result = $stmt->get_result();
 
-      // 結果があるかどうかを確認
       if ($result->num_rows > 0) {
           while ($row = $result->fetch_assoc()) {
-              // プロフィールの出力（エスケープ処理済み）
               echo htmlspecialchars($row["profile"], ENT_QUOTES, 'UTF-8');
           }
       }
       ?>
-      <!-- 編集ボタンの生成 -->
     <a href="edit.php?user_id=<?php echo urlencode($user_id); ?>" class="btn">編集する</a>
     <input type="button" class="btn" onclick="history.back()" value="戻る">
       
     </div>
     </div>
     <?php
-        
+        //ユーザーの過去に投稿した内容を一覧表示する。
         $stmt = $conn->prepare("SELECT * FROM y_main WHERE user_id = ? ORDER BY day DESC");
         $stmt->bind_param("s", $user_id); 
         $stmt->execute();
-
-        // 結果を取得
         $result = $stmt->get_result();
-
-        // 結果があるかどうかを確認
         if ($result->num_rows > 0) {
             echo '<div class="twitter__container">';
-            // echo '<div class="twitter__contents scroll">';
-            
-            // 結果のデータを一行ずつ取得
             while ($row = $result->fetch_assoc()) {
               echo '<div class="twitter__block">';
               
-              // アイコンを表示
-              // デバッグ: 画像パスの確認
               $imagePath = 'images/' . htmlspecialchars($row["icon"], ENT_QUOTES, 'UTF-8');
-              //echo $imagePath; // デバッグ用に画像パスを出力
-
-              // 画像出力処理
+              
               echo '<figure>';
               echo '<img src="' . $imagePath . '" alt="User Image">';
               echo '</figure>';
               
-              // テキスト部分の表示
               echo '<div class="twitter__block-text">';
               echo '<a href="profile.php?user_id='.urlencode($row["user_id"]).'" class="link"><div class="name">'.htmlspecialchars($row["user_name"]).'<span class="name_reply">@'.htmlspecialchars($row["user_id"]).'</span></div></a>';
               echo '<div class="text">' . htmlspecialchars($row["text"]) . '</div><br>'; 
@@ -123,22 +97,18 @@ if ($stmt->execute()) {
 
               echo '<br>';
               
-              // アイコン（返信、ループ、いいねボタンなど）
               echo '<div class="twitter__icon"><span class="twitter-bubble"></span><span class="twitter-loop"></span><span class="twitter-heart"></span></div>';
               
-              // テーブルで「いいね！」の表示
               echo "<table><tr>";
               echo "いいね！".htmlspecialchars($row["count"]); 
               echo "</tr></table>";
               
-              echo "</div>"; // twitter__block-text
-              echo "</div>"; // twitter__block
+              echo "</div>"; 
+              echo "</div>"; 
             }
             
-            // コンテナを閉じる
-            echo "</div>"; // twitter__container
+            echo "</div>"; 
         } else {
-            // 結果がない場合のメッセージ
             echo "これまでに投稿されたものはありません。";
         }
         ?>
